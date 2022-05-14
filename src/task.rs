@@ -1,4 +1,4 @@
-use crate::{Serializer};
+use crate::Serializer;
 use colored::Colorize;
 use std::cmp::Ordering;
 
@@ -82,56 +82,55 @@ impl Task {
         let mut full_name = true;
         let mut full_desc = true;
         while full_name | full_desc {
-            result.push_str(
-                &format!(
-                    "{:<id_wid$} {:<name_max$} {:<desc_max$}\n",
-                    match id.cmp(&0) {
-                        Ordering::Greater => {
-                            let result = id.to_string();
+            result.push_str(&format!(
+                "{:<id_wid$} {:<name_max$} {:<desc_max$}\n",
+                match id.cmp(&0) {
+                    Ordering::Greater => {
+                        let result = id.to_string();
 
-                            id = 0;
+                        id = 0;
 
-                            result
-                        },
-                        _ => "".to_string()
-                    },
-                    match name.len().cmp(&name_max_len) {
-                        Ordering::Less => {
-                            full_name = false;
-                            let result = name;
+                        result
+                    }
+                    _ => "".to_string(),
+                },
+                match name.len().cmp(&name_max_len) {
+                    Ordering::Less => {
+                        full_name = false;
+                        let result = name;
 
-                            name = &name[name.len()..];
+                        name = &name[name.len()..];
 
-                            result
-                        },
-                        _ => {
-                            let result = &name[..name_max_len];
-                            name = &name[name_max_len..];
+                        result
+                    }
+                    _ => {
+                        let result = &name[..name_max_len];
+                        name = &name[name_max_len..];
 
-                            result
-                        },
-                    },
-                    match description.len().cmp(&description_max_len) {
-                        Ordering::Less => {
-                            full_desc = false;
-                            let result = description;
+                        result
+                    }
+                },
+                match description.len().cmp(&description_max_len) {
+                    Ordering::Less => {
+                        full_desc = false;
+                        let result = description;
 
-                            description = &description[description.len()..];
+                        description = &description[description.len()..];
 
-                            result
-                        },
-                        _ => {
-                            let result = &description[..description_max_len];
+                        result
+                    }
+                    _ => {
+                        let result = &description[..description_max_len];
 
-                            description = &description[description_max_len..];
+                        description = &description[description_max_len..];
 
-                            result
-                        }
-                    },
-                    name_max = name_max_len,
-                    desc_max = description_max_len,
-                    id_wid = 3
-                ));
+                        result
+                    }
+                },
+                name_max = name_max_len,
+                desc_max = description_max_len,
+                id_wid = 3
+            ));
         }
 
         result
@@ -226,9 +225,7 @@ impl Project {
                 .tasks
                 .iter()
                 .enumerate()
-                .map(|(index, task)| {
-                        task.to_table_string(index+1, width - id_width)
-                })
+                .map(|(index, task)| task.to_table_string(index + 1, width - id_width))
                 .collect::<Vec<String>>()
                 .join("\n"),
         );
