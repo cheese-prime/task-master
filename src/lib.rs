@@ -9,7 +9,3 @@ pub trait Serializer {
     fn serialize(self) -> String;
     fn deserialize(src: &str) -> Option<Self::Type>;
 }
-
-pub trait ToTableLikeString {
-    fn to_table_string(&self, width: usize) -> String;
-}
