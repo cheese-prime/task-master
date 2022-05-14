@@ -252,7 +252,7 @@ impl Serializer for Project {
     }
 
     fn deserialize(src: &str) -> Option<Self::Type> {
-        let mut lines = src.split("\n");
+        let mut lines = src.split('\n');
 
         let name = match lines.next() {
             Some(val) => val,
