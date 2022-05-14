@@ -1,7 +1,6 @@
 use crate::{Serializer, ToTableLikeString};
-use std::error::Error;
-use std::fmt;
-use std::path::Path;
+use colored::Colorize;
+use std::cmp::Ordering;
 
 #[derive(Debug)]
 pub enum Priority {
@@ -86,10 +85,7 @@ impl Serializer for Task {
             return None;
         }
 
-        let is_completed = match temp.next().unwrap() {
-            "true" => true,
-            _ => false,
-        };
+        let is_completed = matches!(temp.next().unwrap(), "true");
         let name = temp.next().unwrap().to_string();
         let description = temp.next().unwrap().to_string();
         let priority = match Priority::deserialize(temp.next().unwrap()) {
@@ -116,12 +112,15 @@ impl ToTableLikeString for Task {
         // for a visible space between name and description
         let width = width - 1;
 
-        let name_max_len = (width as f64 * 0.4).floor() as usize;
+        let name_max_len = (width as f64 * 0.4).floor() as usize - 1;
         let description_max_len = (width as f64 * 0.6).ceil() as usize;
 
         format!(
-            "{:>name_max$}{:>desc_max$}",
-            name,
+            "{:<name_max$} {:<desc_max$}",
+            match name.len().cmp(&name_max_len) {
+                Ordering::Less => name,
+                _ => &name[..name_max_len],
+            },
             description,
             name_max = name_max_len,
             desc_max = description_max_len
@@ -149,6 +148,10 @@ impl Project {
 
     pub fn tasks(&self) -> &Vec<Task> {
         &self.tasks
+    }
+
+    pub fn add_task(&mut self, task: Task) {
+        self.tasks.push(task);
     }
 }
 
@@ -187,20 +190,42 @@ impl Serializer for Project {
 
 impl ToTableLikeString for Project {
     fn to_table_string(&self, width: usize) -> String {
-        let id_width = (width as f64 * 0.1).ceil() as usize;
+        let id_width = 3;
 
-        self.tasks
-            .iter()
-            .enumerate()
-            .map(|(index, task)| {
-                format!(
-                    "{:<wid$}{}",
-                    index,
-                    task.to_table_string(width - id_width),
-                    wid = id_width
-                )
-            })
-            .collect::<Vec<String>>()
-            .join("\n")
+        let mut result = format!(
+            "{:>center$}{}\n",
+            "",
+            &self.name[..].black().on_white(),
+            center = (width / 2 - self.name.len() / 2)
+        );
+
+        result.push_str(&format!(
+            "{:<id_wid$} {:<name_wid$} {:<desc_wid$}\n",
+            "ID".underline(),
+            "Name".underline(),
+            "Description".underline(),
+            id_wid = id_width,
+            name_wid = ((width - id_width) as f64 * 0.4) as usize - 1,
+            desc_wid = ((width - id_width) as f64 * 0.6) as usize
+        ));
+
+        result.push_str(
+            &self
+                .tasks
+                .iter()
+                .enumerate()
+                .map(|(index, task)| {
+                    format!(
+                        "{:<wid$} {}",
+                        index+1,
+                        task.to_table_string(width - id_width),
+                        wid = id_width
+                    )
+                })
+                .collect::<Vec<String>>()
+                .join("\n"),
+        );
+
+        result
     }
 }
