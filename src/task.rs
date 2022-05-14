@@ -200,6 +200,10 @@ impl Project {
         self.tasks.push(task);
     }
 
+    pub fn remove_task(&mut self, index: usize) {
+        self.tasks.remove(index);
+    }
+
     pub fn to_table_string(&self, width: usize) -> String {
         let id_width = 3;
 
@@ -242,7 +246,7 @@ impl Serializer for Project {
             let mut buf = String::new();
 
             for task in self.tasks {
-                buf += &task.serialize();
+                buf += format!("{}\n", &task.serialize()).as_str();
             }
 
             buf
@@ -262,7 +266,7 @@ impl Serializer for Project {
 
         Some(Project {
             name,
-            tasks: lines.map(|line| Task::deserialize(line).unwrap()).collect(),
+            tasks: lines.filter(|&line| !line.is_empty()).map(|line| Task::deserialize(line).unwrap()).collect(),
         })
     }
 }
