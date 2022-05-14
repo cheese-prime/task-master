@@ -133,19 +133,30 @@ impl Serializer for Project {
     type Type = Project;
 
     fn serialize(self) -> String {
-        format!("{}\n{}", self.name, self.tasks.join("\n"))
+        let joined = {
+            let mut buf = String::new();
+
+            for task in self.tasks {
+                buf += &task.serialize();
+            }
+
+            buf
+        };
+
+        format!("{}\n{}", self.name, joined)
     }
 
     fn deserialize(src: &str) -> Option<Self::Type> {
         let mut lines = src.split("\n");
 
-        if lines.len() < 1 {
-            return None;
-        }
+        let name = match lines.next() {
+            Some(val) => val,
+            None => return None
+        }.to_string();
 
         Some(Project {
-            name: lines.next().unwrap().to_string(),
-            tasks: lines.map(|line| Task::deserialize(line)).collect(),
+            name,
+            tasks: lines.map(|line| Task::deserialize(line).unwrap()).collect(),
         })
     }
 }
