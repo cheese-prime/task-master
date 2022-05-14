@@ -1,6 +1,7 @@
 use std::error::Error;
 
 pub mod cli;
+pub mod fio;
 pub mod task;
 
 pub trait Serializer {
