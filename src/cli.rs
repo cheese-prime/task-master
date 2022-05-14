@@ -3,7 +3,7 @@ use std::error::Error;
 
 pub struct Cli {
     command: String,
-    args: Vec<String>
+    args: Vec<String>,
 }
 
 impl Cli {
@@ -12,9 +12,12 @@ impl Cli {
 
         args.next(); // skip program name
 
-        let command = args.next()?;
+        let command = args.next().unwrap();
 
-        Ok(Cli { command, args: args.collect::<Vec<String>>() })
+        Ok(Cli {
+            command,
+            args: args.collect::<Vec<String>>(),
+        })
     }
 
     pub fn run(self) -> Result<(), Box<dyn Error>> {
@@ -22,7 +25,7 @@ impl Cli {
             "list" => todo!(),
             "add" => todo!(),
             "del" | "delete" => todo!(),
-            _ => todo!()
+            _ => todo!(),
         }
 
         Ok(())
