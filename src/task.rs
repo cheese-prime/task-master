@@ -1,4 +1,4 @@
-use crate::Serializer;
+use crate::{Serializer, ToTableLikeString};
 use std::error::Error;
 use std::fmt;
 use std::path::Path;
@@ -106,6 +106,29 @@ impl Serializer for Task {
     }
 }
 
+impl ToTableLikeString for Task {
+    // name <= 40% of the output line
+    // description >= 60% of the output line
+    fn to_table_string(&self, width: usize) -> String {
+        let name = &self.name[..];
+        let description = &self.description[..];
+
+        // for a visible space between name and description
+        let width = width - 1;
+
+        let name_max_len = (width as f64 * 0.4).floor() as usize;
+        let description_max_len = (width as f64 * 0.6).ceil() as usize;
+
+        format!(
+            "{:>name_max$}{:>desc_max$}",
+            name,
+            description,
+            name_max = name_max_len,
+            desc_max = description_max_len
+        )
+    }
+}
+
 #[derive(Debug)]
 pub struct Project {
     name: String,
@@ -151,12 +174,33 @@ impl Serializer for Project {
 
         let name = match lines.next() {
             Some(val) => val,
-            None => return None
-        }.to_string();
+            None => return None,
+        }
+        .to_string();
 
         Some(Project {
             name,
             tasks: lines.map(|line| Task::deserialize(line).unwrap()).collect(),
         })
+    }
+}
+
+impl ToTableLikeString for Project {
+    fn to_table_string(&self, width: usize) -> String {
+        let id_width = (width as f64 * 0.1).ceil() as usize;
+
+        self.tasks
+            .iter()
+            .enumerate()
+            .map(|(index, task)| {
+                format!(
+                    "{:<wid$}{}",
+                    index,
+                    task.to_table_string(width - id_width),
+                    wid = id_width
+                )
+            })
+            .collect::<Vec<String>>()
+            .join("\n")
     }
 }
