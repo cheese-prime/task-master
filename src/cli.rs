@@ -15,7 +15,7 @@ impl Cli {
 
         args.next(); // skip program name
 
-        let command = args.next().unwrap();
+        let command = args.next().unwrap_or_else(|| "help".to_string());
 
         Cli {
             command,
@@ -91,6 +91,13 @@ impl Cli {
     }
 
     fn help() {
-        todo!()
+        println!(
+            "TaskMaster - cli task manager\n\n\
+            USAGE:\n\
+                \ttm list or tm list [Project name]\n\
+                \ttm add [Project name] ` [Task name] ` [Description of a task] ` [Priority]\n\
+                \ttm delete [Project name] or tm delete [Project name]\n\
+            "
+        )
     }
 }
