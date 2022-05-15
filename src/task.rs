@@ -204,6 +204,10 @@ impl Project {
         self.tasks.remove(index);
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.tasks.is_empty()
+    }
+
     pub fn to_table_string(&self, width: usize) -> String {
         let id_width = 3;
 
@@ -266,7 +270,10 @@ impl Serializer for Project {
 
         Some(Project {
             name,
-            tasks: lines.filter(|&line| !line.is_empty()).map(|line| Task::deserialize(line).unwrap()).collect(),
+            tasks: lines
+                .filter(|&line| !line.is_empty())
+                .map(|line| Task::deserialize(line).unwrap())
+                .collect(),
         })
     }
 }

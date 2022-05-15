@@ -1,8 +1,8 @@
+use crate::task::{Project, Task};
 use crate::{fio, Serializer};
 use std::error::Error;
 use std::{env, io};
 use terminal_size::terminal_size;
-use crate::task::{Project, Task};
 
 pub struct Cli {
     command: String,
@@ -28,7 +28,7 @@ impl Cli {
             "list" => Cli::list(&self.args[..])?,
             "add" => Cli::add(&self.args[..])?,
             "del" | "delete" => Cli::delete(&self.args[..])?,
-            _ => Cli::help()
+            _ => Cli::help(),
         }
 
         Ok(())
@@ -63,7 +63,9 @@ impl Cli {
         let task = args[0].split_once(" ` ").unwrap();
         let project_name = task.0;
 
-        let mut project = fio::find_project(project_name).unwrap_or_else(|_| Some(Project::new(project_name.to_string()))).unwrap();
+        let mut project = fio::find_project(project_name)
+            .unwrap_or_else(|_| Some(Project::new(project_name.to_string())))
+            .unwrap();
         project.add_task(Task::deserialize(format!("false ` {}", task.1).as_str()).unwrap());
 
         fio::save_project(project)?;
@@ -79,6 +81,8 @@ impl Cli {
             project.remove_task(index);
 
             fio::save_project(project)?;
+        } else if let [project_name] = args {
+            fio::remove_project_by_name(project_name)?
         } else {
             Cli::help()
         }

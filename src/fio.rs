@@ -1,7 +1,7 @@
 // FILE INPUT/OUTPUT
 
 use crate::task::Project;
-use crate::{Serializer};
+use crate::Serializer;
 use std::path::Path;
 use std::{fs, io};
 
@@ -12,6 +12,18 @@ pub fn save_project(project: Project) -> Result<(), io::Error> {
         Path::new(&format!("{}/{}", APP_DATA, project.name())),
         project.serialize(),
     )?;
+
+    Ok(())
+}
+
+pub fn remove_project(project: &Project) -> Result<(), io::Error> {
+    fs::remove_file(Path::new(&format!("{}/{}", APP_DATA, project.name())))?;
+
+    Ok(())
+}
+
+pub fn remove_project_by_name(project: &str) -> Result<(), io::Error> {
+    fs::remove_file(Path::new(&format!("{}/{}", APP_DATA, project)))?;
 
     Ok(())
 }
